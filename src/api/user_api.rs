@@ -131,6 +131,11 @@ pub async fn get_user_login(db: Data<MongoRepo>, new_user: Json<Userlogin>) -> H
         name: new_user.name.to_owned(),
         password: new_user.password.to_owned(),
     };
+    let no_user = Userlogin {
+        name: "NONE".to_string(),
+        password: "NONE".to_string(),
+    };
+
     println!("{:#?}", user_data);
     let user_detail = db.get_user_logindb(user_data.name.clone()).await;
     match user_detail {
@@ -139,7 +144,7 @@ pub async fn get_user_login(db: Data<MongoRepo>, new_user: Json<Userlogin>) -> H
                 println!("{:?}", user);
                 HttpResponse::Ok().json(user)
             } else {
-                HttpResponse::NotFound().json(user_data)
+                HttpResponse::Ok().json(no_user)
             }
         }
         Err(err) => HttpResponse::InternalServerError().body(err),
